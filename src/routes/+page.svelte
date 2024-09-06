@@ -61,7 +61,7 @@
             <title>{form.place}</title>
             <fieldset>
                 <legend>
-                    <span style="float: right;"><input type="checkbox" bind:checked={isFahrenheit}>°F</span>
+                    <label style="float: right;"><input type="checkbox" bind:checked={isFahrenheit}>°F</label>
                     <span>{form.place}</span>
                 </legend>
 
