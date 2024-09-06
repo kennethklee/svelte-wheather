@@ -15,7 +15,7 @@ export const actions = {
             const coords = await weather.findCity(city)
             const forecast = await weather.forecastDaily(coords.lat, coords.long)
     
-            return { forecast, city: coords.place }
+            return { forecast, place: coords.place }
         } catch (error) {
             return { error: error.message }
         }
