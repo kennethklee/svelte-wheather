@@ -45,7 +45,7 @@
                 {#if browser && navigator.geolocation}
                     <button
                         bind:this={geoLocateEl}
-                        type="submit"
+                        type="button"
                         formaction="?/forecastByCoords"
                         class="secondary"
                         onclick={geoLocate}
