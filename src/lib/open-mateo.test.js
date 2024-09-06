@@ -9,6 +9,10 @@ describe('city search', () => {
         expect(coord.lat).toEqual(50.11552)
         expect(coord.long).toEqual(8.68417)
     })
+
+    it('should not find any coordinates and throw an error', () => {
+        expect(subject.findCity('non-existant')).rejects.toThrowError()
+    })
 })
 
 describe('daily forecast', () => {

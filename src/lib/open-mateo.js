@@ -30,17 +30,24 @@ function citySearchURL(city) {
     return `https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1`
 }
 
+/** @typedef {{[key: string]: any[]}} Forecast */
+/** @typedef {{long: number, lat: number, place: string}} Coordinates */
 export class OpenMateo {
-    /** @typedef {{expires: number, [key: string]: any[]}} Forecast */
-    /** @typedef {{expires: number, long: number, lat: number}} Coordinates */
-    /** @type {{[key: string]: Promise<Forecast | Coordinates>}} */
+    /** @type {{[key: string]: {expires: number, payload: Promise<Forecast | Coordinates>}}}} */
     cache = {} // simple cache
-    ttl = 30 * 1000 // 30 seconds
+    ttl = 60 * 1000 // 60 seconds
 
     getCache(key) {
         if (key in this.cache && Date.now() < this.cache[key].expires) {
-            return this.cache[key]
+            return this.cache[key].payload
         }
+    }
+
+    setCache(key, value) {
+        this.cache[key] = {
+            expires: Date.now() + this.ttl,...value,
+            payload: value
+         }
     }
 
     /**
@@ -53,9 +60,11 @@ export class OpenMateo {
         const cacheHit = this.getCache(forecastKey(lat, long))
         if (cacheHit) return cacheHit
 
-        return this.cache[forecastKey(lat, long)] = fetch(dailyForecastURL(lat, long))
+        const action = fetch(dailyForecastURL(lat, long))
             .then(res => res.json())
-            .then((data) => ({ ...data.daily, expires: Date.now() + this.ttl }))
+            .then((data) => data.daily)
+        this.setCache(forecastKey(lat, long), action)
+        return action
     }
 
     /**
@@ -67,15 +76,17 @@ export class OpenMateo {
         const cacheHit = this.getCache(cityKey(city))
         if (cacheHit) return cacheHit
 
-        return this.cache[cityKey(city)] = fetch(citySearchURL(city))
+        const action = fetch(citySearchURL(city))
            .then(res => res.json())
            .then((data) => {
                 if (!data.results) throw new Error('No results')
                 return {
-                    expires: Date.now() + this.ttl,
+                    place: `${data.results[0].name}, ${data.results[0].country}`,
                     long: data.results[0].longitude,
                     lat: data.results[0].latitude,
                 }
             })
+        this.setCache(cityKey(city), action)
+        return action
     }
 }
