@@ -29,8 +29,10 @@
     }
 </script>
 
+<title>{form?.place ?? 'Weather'} Forecast</title>
+
 <main class="container">
-    <h1>Wheater Forecast</h1>
+    <h1>Weather Forecast</h1>
 
     <section>
         <form method="POST" action="?/forecast" use:enhance>
