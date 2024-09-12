@@ -18,8 +18,10 @@
                 lat = position.coords.latitude
                 long = position.coords.longitude
 
-                await tick()
+                await tick() // wait for svelte to render
                 document.forms[0].requestSubmit(geoLocateEl)
+            }, (ev) => {
+                alert('Unable to retrieve your location: ' + ev.message)
             })
         } else {
             alert('Geolocation is not supported by this browser.')
@@ -42,16 +44,16 @@
             <input type="hidden" name="long" bind:value={long} />
 
             <div class="grid">
+                <button type="submit" class="primary">Forecast</button>
                 {#if browser && navigator.geolocation}
                     <button
                         bind:this={geoLocateEl}
-                        type="button"
+                        type="submit"
                         formaction="?/forecastByCoords"
                         class="secondary"
                         onclick={geoLocate}
                     >Geo Locate</button>
                 {/if}
-                <button type="submit" class="primary">Forecast</button>
             </div>
         </form>
     </section>
